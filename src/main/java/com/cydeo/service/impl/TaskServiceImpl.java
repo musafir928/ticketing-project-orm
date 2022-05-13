@@ -69,4 +69,9 @@ public class TaskServiceImpl implements TaskService {
             taskRepository.save(taskFound.get());
         }
     }
+
+    @Override
+    public int getCountByProjectAndStatus(String projectCode, Status status){
+       return taskRepository.countAllByProjectProjectCodeAndTaskStatus(projectCode,status);
+    }
 }
