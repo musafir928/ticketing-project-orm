@@ -1,6 +1,7 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.TaskDTO;
+import com.cydeo.entity.Task;
 import com.cydeo.enums.Status;
 import com.cydeo.mapper.TaskMapper;
 import com.cydeo.repository.TaskRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +26,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDTO findById(Long id) {
-        return taskMapper.convertToDTO(taskRepository.getById(id));
+        Optional<Task> taskFound = taskRepository.findById(id);
+        if (taskFound.isPresent()) {
+            return taskMapper.convertToDTO(taskFound.get());
+        }
+        return null;
     }
 
     @Override
@@ -44,11 +50,23 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void update(TaskDTO dto) {
+        Optional<Task> taskFound = taskRepository.findById(dto.getId());
+        Task convertedTask = taskMapper.convertToEntity(dto);
 
+        if(taskFound.isPresent()) {
+            convertedTask.setId(taskFound.get().getId());
+            convertedTask.setTaskStatus(taskFound.get().getTaskStatus());
+            convertedTask.setAssignedDate(taskFound.get().getAssignedDate());
+            taskRepository.save(convertedTask);
+        }
     }
 
     @Override
     public void delete(Long id) {
-
+        Optional<Task> taskFound = taskRepository.findById(id);
+        if (taskFound.isPresent()) {
+            taskFound.get().setIsDeleted(true);
+            taskRepository.save(taskFound.get());
+        }
     }
 }
