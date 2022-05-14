@@ -74,4 +74,13 @@ public class TaskServiceImpl implements TaskService {
     public int getCountByProjectAndStatus(String projectCode, Status status){
        return taskRepository.countAllByProjectProjectCodeAndTaskStatus(projectCode,status);
     }
+
+    @Override
+    public void deleteByProject(String projectCode) {
+        taskRepository.findAllByProjectCode(projectCode).forEach(task->{
+            task.setIsDeleted(true);
+            taskRepository.save(task);
+
+        });
+    }
 }

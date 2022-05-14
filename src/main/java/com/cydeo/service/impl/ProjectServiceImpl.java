@@ -59,6 +59,8 @@ public class ProjectServiceImpl implements ProjectService {
     public void delete(String code) {
         Project project = projectRepository.findByProjectCode(code);
         project.setIsDeleted(true);
+        project.setProjectCode(project.getProjectCode() + '_' + project.getId());
+        taskService.deleteByProject(code);
         projectRepository.save(project);
     }
 
@@ -79,6 +81,8 @@ public class ProjectServiceImpl implements ProjectService {
                     dto.setUnfinishedTaskCounts(
                             taskService.getCountByProjectAndStatus(
                                     project.getProjectCode(), Status.OPEN
+                            ) + taskService.getCountByProjectAndStatus(
+                                    project.getProjectCode(), Status.IN_PROGRESS
                             ));
                     dto.setCompleteTaskCounts(
                             taskService.getCountByProjectAndStatus(
