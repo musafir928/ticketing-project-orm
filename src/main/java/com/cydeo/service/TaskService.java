@@ -13,5 +13,9 @@ public interface TaskService {
     void update(TaskDTO dto);
     void delete(Long id);
     int getCountByProjectAndStatus(String projectCode, Status status);
-    List<Task> deleteByProject(String projectCode);
+    void deleteByProject(String projectCode);
+
+    void completeByProject(String code);
+
+    List<TaskDTO> listAllTasksByStatusIsNot(Status status);
 }

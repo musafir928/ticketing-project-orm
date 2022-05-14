@@ -68,6 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
     public void complete(String code) {
         Project project = projectRepository.findByProjectCode(code);
         project.setProjectStatus(Status.COMPLETE);
+        taskService.completeByProject(code);
         projectRepository.save(project);
     }
 

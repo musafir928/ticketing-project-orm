@@ -1,11 +1,15 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.TaskDTO;
+import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.Task;
+import com.cydeo.entity.User;
 import com.cydeo.enums.Status;
 import com.cydeo.mapper.TaskMapper;
 import com.cydeo.repository.TaskRepository;
+import com.cydeo.repository.UserRepository;
 import com.cydeo.service.TaskService;
+import com.cydeo.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,10 +22,12 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final UserRepository userRepository;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -77,10 +83,24 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void deleteByProject(String projectCode) {
-        taskRepository.findAllByProjectCode(projectCode).forEach(task->{
+        taskRepository.findAllByProjectProjectCode(projectCode).forEach(task->{
             task.setIsDeleted(true);
             taskRepository.save(task);
-
         });
+    }
+
+    @Override
+    public void completeByProject(String code) {
+        taskRepository.findAllByProjectProjectCode(code).forEach(task->{
+            task.setIsDeleted(true);
+            taskRepository.save(task);
+        });
+    }
+
+    @Override
+    public List<TaskDTO> listAllTasksByStatusIsNot(Status status) {
+        User loggedInUser = userRepository.findByUserName("harold@manager.com");
+        List<Task> list = taskRepository.findAllByTaskStatusIsNotAndUser(status, loggedInUser);
+        return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
     }
 }
