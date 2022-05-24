@@ -61,7 +61,7 @@ public class TaskServiceImpl implements TaskService {
 
         if(taskFound.isPresent()) {
             convertedTask.setId(taskFound.get().getId());
-            convertedTask.setTaskStatus(taskFound.get().getTaskStatus());
+            convertedTask.setTaskStatus(dto.getTaskStatus() == null ? taskFound.get().getTaskStatus() : dto.getTaskStatus());
             convertedTask.setAssignedDate(taskFound.get().getAssignedDate());
             taskRepository.save(convertedTask);
         }
@@ -93,14 +93,33 @@ public class TaskServiceImpl implements TaskService {
     public void completeByProject(String code) {
         taskRepository.findAllByProjectProjectCode(code).forEach(task->{
             task.setIsDeleted(true);
+            task.setTaskStatus(Status.COMPLETE);
             taskRepository.save(task);
         });
     }
 
     @Override
     public List<TaskDTO> listAllTasksByStatusIsNot(Status status) {
-        User loggedInUser = userRepository.findByUserName("harold@manager.com");
-        List<Task> list = taskRepository.findAllByTaskStatusIsNotAndUser(status, loggedInUser);
+        User loggedInUser = userRepository.findByUserName("john@employee.com");
+        List<Task> list = taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(status, loggedInUser);
         return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TaskDTO> listAllTasksByStatus(Status status) {
+        User loggedInUser = userRepository.findByUserName("john@employee.com");
+        List<Task> list = taskRepository.findAllByTaskStatusAndAssignedEmployee(status, loggedInUser);
+        return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateStatus(TaskDTO dto) {
+        Optional<Task> task  = taskRepository.findById(dto.getId());
+
+        if(task.isPresent()) {
+            task.get().setTaskStatus(dto.getTaskStatus());
+            taskRepository.save(task.get());
+        }
+
     }
 }

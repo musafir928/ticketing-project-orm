@@ -18,4 +18,8 @@ public interface TaskService {
     void completeByProject(String code);
 
     List<TaskDTO> listAllTasksByStatusIsNot(Status status);
+
+    List<TaskDTO> listAllTasksByStatus(Status complete);
+
+    void updateStatus(TaskDTO task);
 }
